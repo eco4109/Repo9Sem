@@ -60,6 +60,13 @@ public class pc{
 
 
 	public static boolean CPUInt = false;
+	public static boolean EnInterrupcion;
+	public static int n = 0; //Variable para el numero de cosas en la cola de interrupciones
+	public static int max = 10; //Máximo 10 interrupciones en el vector de interrupciones
+	public static int[] Int_cola = new int[max]; //Vector de interrupciones, tamaño 10 
+	public static int e;
+	public static int s;
+	public static int x;
 
 
 	//Dispositivos y arranque del BIOS
@@ -424,7 +431,39 @@ public class pc{
 		int valorEntero = (int) f;
 		return valorEntero;
 	}
+	
+	public static void push(int x){
+		if(((EnInterrupcion)&&(x==0))){ //Si estoy en interrupcion y entra una d ereloj, NO HACER NADA x = 0 <- interrupcion de reloj
+			//No hacer nada, nada de nada
+		}
+		if (n==max){
+			System.out.println("La cola está llena");
+		}else{
+			n = n+1;
+			Int_cola[e] = x;
+			if(e==(max-1)){
+				e = 0;
+			}else{
+				e = e+1;
+			}
+		}
+	}
 
+	public static int pop(){
+		if(n==0){
+			System.out.println("cola vacia");
+		}else{
+			n = n-1;
+			x = Int_cola[s];
+			if(s==(max-1)){
+				s=0;
+			}else{
+				s = s+1;
+			}
+		}
+		return x;
+	}
+	
 	public static void dump(int mem){
 		String var1, var2;
 		String[] NomReg=new String[14];
@@ -645,22 +684,61 @@ public class pc{
 class Computadora extends Thread{
 	public void run(){
 		while(!pc.PSW[14]){
+			int y;
+			int x;
 			pc.capta();
 		 	pc.traduce();
 		 	pc.ejecuta();
 		 	System.out.println("Un Ciclo de Fetch Terminado ... ");
 		 	if(pc.CPUInt){
-		 		//pc.dump(0);
+				pc.CPUInt = false;
+				pc.EnInterrupcion = true;
+				//=========================
+				y = pc.RAM[0]+pc.RAM[1];
+				pc.RAM[y] = pc.IP;
+				pc.RAM[y+4] = pc.BP;
+				pc.RAM[pc.BP] = pc.RAM[3] + pc.RAM[4];
+
+				System.out.println("Press Any Key To Continue...");
+				new java.util.Scanner(System.in).nextLine();
+				//REESPALDAR PROCEDIMIENTO ACTUAL!!!
+		 		pc.PSW[15] = true; //Cambiamos a modo kernel
 		 		System.out.println("\7Fetch Interrumpido ... ");
 		 	}	
-			pc.CPUInt = false;
-		 	
 		}
 	}
 
 }
 
-class Interrupcion extends Thread{
+/*
+12/11/2018
+
+red()
+	push(1)
+	
+e_s()
+	push(2)
+
+reloj()
+	trans = 0
+	reloj = t_actual
+	mientras(true){
+		trans = t_actual - reloj
+		si(trans > quantum){
+			push(0)
+			reloj = t_actual
+			trans
+		}
+	}
+
+VECTOR DE INTERRUPCIONES
+0	8500	Interrupcion de reloj
+1	2300	Interrupción de red
+2	1000	Interrupción de E/S
+
+*/
+
+class reloj extends Thread{
 	public void run(){ //Genera la interrupcion de justicia, alterna entre procesos
 		long quantum = 500; //Interrupción de justicia
 		
@@ -673,7 +751,8 @@ class Interrupcion extends Thread{
 				if((diferencia >= quantum - 10)&&(diferencia <= quantum +10)){
 					//pc.CPUInt = true;
 					System.out.println("INTERRUPCION !\7");
-					cola.insertarCola(1);
+					//cola.insertarCola(1);
+					pc.push(0);
 					horaInicial = horaSistema;					
 					//System.out.println("Press Any Key To Continue...");
 					//new java.util.Scanner(System.in).nextLine();
@@ -695,85 +774,4 @@ class Interrupcion extends Thread{
 		}*/
 	}
 
-}
-
-
-
-class cola{
-	static int max = 10; //Tamaño máximo de la cola
-	static int[] cola = new int[max]; //Definición de la cola circular de tamaño "n"
-	static int inicioC, finC; //Indicadores del inicio y final de la cola
-	static int noElementos; //Contador de numero de elementos en la cola
-
-	public static void inicializarCola(){ //Fución para iniciar la cola y los apuntadores
-		inicioC = -1;
-		finC = -1;
-		System.out.println("\n\nCola inicializada resiona para continuar ... ...\n");
-		new java.util.Scanner(System.in).nextLine();
-	}
-
-	public static void insertarCola(int dato){ //Inserta en la cola un entero
-		if((finC == max-1 && inicioC == 0) || (finC+1==inicioC)){
-			System.out.println("\nCOLA LLENA:\n");
-			mostrarCola();
-			System.out.println("\nTERMINA PROGRAMA");
-			System.exit(0);
-		}
-		noElementos ++;
-		if(finC==max-1 && inicioC!=0){
-			finC = 0;
-		}else{
-			finC++;
-		}
-
-		cola[finC] = dato;
-		System.out.println("Dato insertado correctamente: "+dato+" Datos en la cola: "+noElementos);
-
-		
-		if(inicioC==-1){
-			inicioC = 0;
-		}
-	}
-
-	public static void removerCola(){ //Remover un elemento de a cola
-		if(inicioC==-1) {
-			System.out.println("\nCOLA VACIA\n");
-			return;
-		}
-		System.out.println("Dato eliminado correctamente: "+cola[inicioC]);
-		noElementos = noElementos -1;
-		if(inicioC==finC){
-			inicioC=-1;
-			finC=-1;
-			return;
-		}
-		if(inicioC==max){
-			inicioC=0; 
-		}else {
-			inicioC++;
-		}
-	}
-
-
-	public static void mostrarCola(){ //Muestra la cola
-		if(inicioC == -1 ){
-			System.out.println("\nCOLA VACIA\n");
-		}else{
-			int i=inicioC;
-			System.out.print("\n\nVolcado de la Cola: [");
-			do {
-				System.out.print(" "+cola[i]+" ");
-				i++;
-				if(i==max && inicioC>finC){
-					i=0; // Reiniciar en cero (dar la vuelta)	
-				} 
-			}while(i!=finC+1);
-			System.out.println("]");
-			//System.out.println("Inicio: "+inicioC);
-			//System.out.println("Fin: "+fin);
-			//System.out.println("Max: "+max);
-			System.out.println("\nCola volcada, presiona para continuar ... ...\n");
-			new java.util.Scanner(System.in).nextLine();
-		}
-	}
 }
