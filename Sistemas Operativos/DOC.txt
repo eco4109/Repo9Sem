@@ -1,11 +1,12 @@
-  
+55 7100 2180
+987 158 2676
 
 
 
 Push pila de interrupciones:
 
 Push(x)
-  no meter si esta en interrupcion y si se pide meter 0
+  no meter si esta en interrupcion y si se pide meter 1
   Si (n=Max)
     Cola llena
   otro
@@ -46,9 +47,10 @@ pc()
 	CPU_Int = F
 	En_Int = V
 	y = RAM(0)+RAM(1)
-	RAM(y)=IP
-	RAM(y+4) = BP
-	BP = RAM(3)+RAM(4)
+	RAM(y)=BP
+	RAM(y+4) = IP
+	BP = RAM(2)+RAM(3)
+	IP=0
 	PSW(15) = V
      fins
    finmientras
@@ -68,7 +70,7 @@ reloj()
   mientras(true)
    transc = t_actual-reloj
    si(transc>quantum)
-      push(0)
+      push(1)
       reloj=t_actual
       transc=0
    fins
@@ -87,6 +89,11 @@ fin_funcion
 
 VECTOR DE INTERRUPCIONES
 
-0	8500	Interrupcion de reloj
-1	2300	Interrupcion de red
-2	1000	Interrupcion de e/s
+1	8500	Interrupcion de reloj
+2	2300	Interrupcion de red
+3	1000	Interrupcion de e/s
+
+
+
+
+
