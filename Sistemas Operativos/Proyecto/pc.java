@@ -205,12 +205,13 @@ public class pc{
 		x++;
 		buff_dato[3]=RAM[x];
 
-		System.out.printf("Buffer de traduccion: %02X", buff_trad[0]);
+		/*System.out.printf("Buffer de traduccion: %02X", buff_trad[0]);
 		System.out.printf("Buffer de traduccion: %02X", buff_trad[1]);
 		System.out.printf("Buffer de DATO: %02X", buff_dato[0]);
 		System.out.printf("Buffer de DATO: %02X", buff_dato[1]);
 		System.out.printf("Buffer de DATO: %02X", buff_dato[2]);
 		System.out.printf("Buffer de DATO: %02X", buff_dato[3]);
+		*/
 	}
 
 	public static int char_to_int(char caracter){ //Funcition for transform CHARACTERS INTO INTEGERS
@@ -278,16 +279,17 @@ public class pc{
 		}
 		float j = IEEE_a_flotante(R[IP])+largo;
 		R[IP] = flotante_a_IEEE(j);
-		System.out.println("IP: -----------------------------   "+forceint(IEEE_a_flotante(R[IP])));
+		System.out.println("IP: --- --- ---    "+forceint(IEEE_a_flotante(R[IP])));
 		float f = IEEE_a_flotante(R[OI]);
 		float w = s*(f+s*largo);
 		R[OI]=flotante_a_IEEE(w);
 		orig = (buff_trad[1]&0xF0)>>>4;
 		dest = (buff_trad[1]&0xF);
 
-		System.out.println("Codigo de la Instruccion = "+cod_inst);
+		/*System.out.println("Codigo de la Instruccion = "+cod_inst);
 		System.out.println("Origen = "+orig);
 		System.out.println("Destino = "+dest);
+		*/
 }
 	public static float IEEE_a_flotante( int f){
 		float yy = Float.intBitsToFloat((f));
